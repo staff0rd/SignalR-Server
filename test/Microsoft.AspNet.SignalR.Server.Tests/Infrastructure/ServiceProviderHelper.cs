@@ -36,7 +36,7 @@ namespace Microsoft.AspNet.SignalR.Tests
         {
             IFeatureCollection IServer.Features { get; }
             
-            public void Start(RequestDelegate requestDelegate)
+            public void Start<THttpContext>(IHttpApplication<THttpContext> application)
             {
 
             }
