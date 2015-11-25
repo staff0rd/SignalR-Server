@@ -130,12 +130,27 @@ namespace Microsoft.AspNet.SignalR.Transports
 
         protected virtual async Task ProcessSendRequest()
         {
-            var form = await Context.Request.ReadFormAsync().PreserveCulture();
-            string data = form["data"];
+            var data = await GetData().PreserveCulture();
 
             if (Received != null)
             {
                 await Received(data).PreserveCulture();
+            }
+        }
+
+        private async Task<string> GetData()
+        {
+            if (Context.Request.HasFormContentType)
+            {
+                var form = await Context.Request.ReadFormAsync().PreserveCulture();
+                return form["data"];
+            }
+            else
+            {
+                var stream = new System.IO.StreamReader(Context.Request.Body);
+                var output = await stream.ReadToEndAsync().PreserveCulture();
+                var decoded = UrlDecoder.UrlDecode(output);
+                return decoded.Replace("data=", "");
             }
         }
 
